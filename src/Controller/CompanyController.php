@@ -11,6 +11,35 @@ use FOS\RestBundle\Controller\Annotations\RequestParam;
 
 class CompanyController extends AbstractFOSRestController
 {
+
+    /**
+     * @Rest\Get("/companies/{id}", name="companies.id")
+     */
+    public function companyById(int $id):Response
+    {
+        $em = $this->getDoctrine()->getManager();
+        $company = $em->getRepository(Company::class)->getCompanyById($id);
+
+        $response = new Response(json_encode($company));
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
+    }
+
+    /**
+     * @Rest\Get("/companies/{name}", name="companies.id")
+     */
+    public function companyByName(string $name):Response
+    {
+        $em = $this->getDoctrine()->getManager();
+        $company = $em->getRepository(Company::class)->getCompanyByName($name);
+
+        $response = new Response(json_encode($company));
+        $response->headers->set('Content-Type', 'application/json');
+
+        return $response;
+    }
+
     /**
      * @Rest\QueryParam(name="building", requirements="\d+", strict=true, nullable=true, description="")
      *

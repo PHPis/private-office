@@ -20,6 +20,31 @@ class CompanyRepository extends ServiceEntityRepository
         parent::__construct($registry, Company::class);
     }
 
+    public function getCompanyByName(string $name): array
+    {
+        $query = $this->createQueryBuilder('c')
+            ->select('c.id','c.name', 'c.phone')
+            ->orderBy('c.id', 'ASC');
+        $query
+            ->andWhere($query->expr()->like('c.name', ':name'))
+            ->setParameter('name', "%".$name."%");
+        return $query
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    public function getCompanyById(int $id): array
+    {
+        $query = $this->createQueryBuilder('c')
+            ->select('c.id','c.name', 'c.phone')
+            ->andWhere('c.id = :id')
+            ->setParameter('id', $id)
+            ->orderBy('c.id', 'ASC');
+        return $query
+            ->getQuery()
+            ->getArrayResult();
+    }
+
     public function getCompaniesFromBuilding(int $building): array
     {
         $query = $this->createQueryBuilder('c')
