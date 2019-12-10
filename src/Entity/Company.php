@@ -29,14 +29,14 @@ class Company
     private $phone = [];
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Building", inversedBy="companies")
-     */
-    private $building;
-
-    /**
      * @ORM\ManyToMany(targetEntity="App\Entity\Rubric", inversedBy="companies")
      */
     private $rubric;
+
+    /**
+     * @ORM\ManyToOne(targetEntity="App\Entity\Building", inversedBy="company")
+     */
+    private $building;
 
     public function __construct()
     {
@@ -74,32 +74,6 @@ class Company
     }
 
     /**
-     * @return Collection|Building[]
-     */
-    public function getBuilding(): Collection
-    {
-        return $this->building;
-    }
-
-    public function addBuilding(Building $building): self
-    {
-        if (!$this->building->contains($building)) {
-            $this->building[] = $building;
-        }
-
-        return $this;
-    }
-
-    public function removeBuilding(Building $building): self
-    {
-        if ($this->building->contains($building)) {
-            $this->building->removeElement($building);
-        }
-
-        return $this;
-    }
-
-    /**
      * @return Collection|Rubric[]
      */
     public function getRubric(): Collection
@@ -121,6 +95,18 @@ class Company
         if ($this->rubric->contains($rubric)) {
             $this->rubric->removeElement($rubric);
         }
+
+        return $this;
+    }
+
+    public function getBuilding(): ?Building
+    {
+        return $this->building;
+    }
+
+    public function setBuilding(?Building $building): self
+    {
+        $this->building = $building;
 
         return $this;
     }

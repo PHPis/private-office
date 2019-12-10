@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Rubric;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use function Doctrine\ORM\QueryBuilder;
 
 /**
  * @method Rubric|null find($id, $lockMode = null, $lockVersion = null)
@@ -19,6 +20,27 @@ class RubricRepository extends ServiceEntityRepository
         parent::__construct($registry, Rubric::class);
     }
 
+    public function getAllBasicInArray()
+    {
+        $query = $this->createQueryBuilder('r')
+            ->orderBy('r.id', 'ASC');
+        $query->andWhere($query->expr()->isNull('r.parent'));
+        return $query
+            ->getQuery()
+            ->getArrayResult();
+    }
+
+    public function getAllChildrenInArray(int $id)
+    {
+        $query = $this->createQueryBuilder('r')
+            ->select('r.id, r.name')
+            ->orderBy('r.id', 'ASC');
+        $query->andWhere('r.parent = :parent')
+            ->setParameter('parent', $id);
+        return $query
+            ->getQuery()
+            ->getArrayResult();
+    }
     // /**
     //  * @return Rubric[] Returns an array of Rubric objects
     //  */

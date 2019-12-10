@@ -10,11 +10,13 @@ class BuildingFixtures extends Fixture
 {
     public function load(ObjectManager $manager)
     {
-        for ($i = 0; $i < 10; $i++){
-            $building = new Building();
-            $building->setAddress('Address-' . $i);
-            $building->setCoords([rand(0, 100), rand(0, 100)]);
-        }
+//        for ($i = 0; $i < 30; $i++){
+//            $building = new Building();
+//            $building->setAddress('Address-' . $i);
+//            $building->setXCoord(mt_rand(0, 10000));
+//            $building->setYCoord(mt_rand(0, 10000));
+//            $manager->persist($building);
+//        }
 
         $manager->flush();
     }

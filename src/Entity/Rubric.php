@@ -81,6 +81,21 @@ class Rubric
         return $this->children;
     }
 
+    public function getTree($arr = [])
+    {
+        $children = $this->getChildren();
+        if ($children != null){
+            foreach ($children as $child) {
+                array_push($arr, [
+                    'id' => $child->getId(),
+                    'name' => $child->getName(),
+                    'children' => $child->getTree(),
+                ]) ;
+            }
+        }
+        return $arr;
+    }
+
     public function addChild(self $child): self
     {
         if (!$this->children->contains($child)) {

@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Company;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use function Doctrine\ORM\QueryBuilder;
 
 /**
  * @method Company|null find($id, $lockMode = null, $lockVersion = null)
@@ -19,32 +20,51 @@ class CompanyRepository extends ServiceEntityRepository
         parent::__construct($registry, Company::class);
     }
 
-    // /**
-    //  * @return Company[] Returns an array of Company objects
-    //  */
-    /*
-    public function findByExampleField($value)
+    public function getCompaniesFromBuilding(int $building): array
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
-            ->orderBy('c.id', 'ASC')
-            ->setMaxResults(10)
+        $query = $this->createQueryBuilder('c')
+            ->andWhere('c.building = :building')
+            ->setParameter('building', $building)
+            ->orderBy('c.id', 'ASC');
+        return $query
             ->getQuery()
-            ->getResult()
-        ;
+            ->getArrayResult();
     }
-    */
 
-    /*
-    public function findOneBySomeField($value): ?Company
+    public function getCompaniesWithRubric(int $rubric): array
     {
-        return $this->createQueryBuilder('c')
-            ->andWhere('c.exampleField = :val')
-            ->setParameter('val', $value)
+        $query = $this->createQueryBuilder('c')
+            ->andWhere(' :rubric MEMBER OF c.rubric')
+            ->setParameter('rubric', $rubric)
+            ->orderBy('c.id', 'ASC');
+        return $query
             ->getQuery()
-            ->getOneOrNullResult()
-        ;
+            ->getArrayResult();
     }
-    */
+
+    public function getCompaniesInRadius(int $xCoord, int $yCoord, int $radius):array
+    {
+        $query = $this->createQueryBuilder('c')
+            ->orderBy('c.id', 'ASC');
+        $query
+            ->innerJoin('App\Entity\Building', 'b')
+            ->andWhere('c.building = b.id')
+            ->andWhere($query->expr()
+                ->lte($query->expr()->sqrt(
+                    $query->expr()->sum(
+                        $query->expr()->prod(
+                            $query->expr()->diff('b.xCoord', ':xCoord'), $query->expr()->diff('b.xCoord', ':xCoord')
+                        ),
+                        $query->expr()->prod(
+                            $query->expr()->diff('b.yCoord', ':yCoord'), $query->expr()->diff('b.yCoord', ':yCoord')
+                        )
+                    )),
+                    ':radius'))
+            ->setParameter('xCoord', $xCoord)
+            ->setParameter('yCoord', $yCoord)
+            ->setParameter('radius', $radius);
+        return $query
+            ->getQuery()
+            ->getArrayResult();
+    }
 }

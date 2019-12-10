@@ -23,19 +23,25 @@ class Building
      */
     private $address;
 
-    /**
-     * @ORM\Column(type="array")
-     */
-    private $coords = [];
 
     /**
-     * @ORM\ManyToMany(targetEntity="App\Entity\Company", mappedBy="building")
+     * @ORM\Column(type="integer")
      */
-    private $companies;
+    private $xCoord;
+
+    /**
+     * @ORM\Column(type="integer")
+     */
+    private $yCoord;
+
+    /**
+     * @ORM\OneToMany(targetEntity="App\Entity\Company", mappedBy="building")
+     */
+    private $company;
 
     public function __construct()
     {
-        $this->companies = new ArrayCollection();
+        $this->company = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -55,14 +61,28 @@ class Building
         return $this;
     }
 
-    public function getCoords(): ?array
+    
+
+    public function getXCoord(): ?int
     {
-        return $this->coords;
+        return $this->xCoord;
     }
 
-    public function setCoords(array $coords): self
+    public function setXCoord(int $xCoord): self
     {
-        $this->coords = $coords;
+        $this->xCoord = $xCoord;
+
+        return $this;
+    }
+
+    public function getYCoord(): ?int
+    {
+        return $this->yCoord;
+    }
+
+    public function setYCoord(int $yCoord): self
+    {
+        $this->yCoord = $yCoord;
 
         return $this;
     }
@@ -70,16 +90,16 @@ class Building
     /**
      * @return Collection|Company[]
      */
-    public function getCompanies(): Collection
+    public function getCompany(): Collection
     {
-        return $this->companies;
+        return $this->company;
     }
 
     public function addCompany(Company $company): self
     {
-        if (!$this->companies->contains($company)) {
-            $this->companies[] = $company;
-            $company->addBuilding($this);
+        if (!$this->company->contains($company)) {
+            $this->company[] = $company;
+            $company->setBuilding($this);
         }
 
         return $this;
@@ -87,9 +107,12 @@ class Building
 
     public function removeCompany(Company $company): self
     {
-        if ($this->companies->contains($company)) {
-            $this->companies->removeElement($company);
-            $company->removeBuilding($this);
+        if ($this->company->contains($company)) {
+            $this->company->removeElement($company);
+            // set the owning side to null (unless already changed)
+            if ($company->getBuilding() === $this) {
+                $company->setBuilding(null);
+            }
         }
 
         return $this;
